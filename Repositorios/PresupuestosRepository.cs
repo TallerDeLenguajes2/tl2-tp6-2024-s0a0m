@@ -1,7 +1,7 @@
 using Microsoft.Data.Sqlite;
-using tl2_tp5_2024_s0a0m.Models;
+using tl2_tp6_2024_s0a0m.Models;
 
-namespace tl2_tp5_2024_s0a0m.Repositorios;
+namespace tl2_tp6_2024_s0a0m.Repositorios;
 
 public class PresupuestosRepository : IPresupuestosRepository
 {

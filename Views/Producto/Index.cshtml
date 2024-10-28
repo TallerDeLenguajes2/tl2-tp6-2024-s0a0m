@@ -1,0 +1,27 @@
+@model IEnumerable<tl2_tp6_2024_s0a0m.Models.Producto>
+
+@{
+    ViewData["Title"] = "Lista de Productos";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID Producto</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var producto in Model)
+        {
+            <tr>
+                <td>@producto.IdProducto</td>
+                <td>@producto.Descripcion</td>
+                <td>@String.Format("{0:C}", producto.Precio)</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,8 +1,8 @@
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
-using tl2_tp5_2024_s0a0m.Models;
+using tl2_tp6_2024_s0a0m.Models;
 
-namespace tl2_tp5_2024_s0a0m.Repositorios;
+namespace tl2_tp6_2024_s0a0m.Repositorios;
 
 public class ProductoRepository : IProductoRepository
 {
@@ -48,6 +48,7 @@ public class ProductoRepository : IProductoRepository
                     {
                         var producto = new Producto();
                         producto.IdProducto = Convert.ToInt32(reader["idProducto"]);
+                        producto.Precio = Convert.ToInt32(reader["Precio"]);
                         producto.Descripcion = reader["Descripcion"].ToString();
 
                         // hacer el *** while
