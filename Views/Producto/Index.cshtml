@@ -6,6 +6,10 @@
 
 <h1>@ViewData["Title"]</h1>
 
+<a asp-action="CrearProducto" asp-controller="Producto" class="btn btn-primary mb-3">
+    Crear Nuevo Producto
+</a>
+
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -21,7 +25,27 @@
                 <td>@producto.IdProducto</td>
                 <td>@producto.Descripcion</td>
                 <td>@String.Format("{0:C}", producto.Precio)</td>
+                <td>
+                    <a asp-action="ModificarProducto" 
+                       asp-controller="Producto" 
+                       asp-route-id="@producto.IdProducto" 
+                       class="btn btn-warning">
+                        Editar
+                    </a>
+                </td>
+                <td>
+                    <form asp-action="EliminarProducto" 
+                        asp-controller="Producto" 
+                        asp-route-id="@producto.IdProducto" 
+                        method="post" 
+                        style="display:inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                        Eliminar
+                    </button>
+                </form>
+                </td>
             </tr>
         }
     </tbody>
 </table>
+

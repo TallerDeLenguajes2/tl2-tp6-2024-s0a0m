@@ -1,0 +1,59 @@
+@model IEnumerable<tl2_tp6_2024_s0a0m.Models.Presupuesto>
+
+@{
+    ViewData["Title"] = "Listado de Presupuestos";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID Presupuesto</th>
+            <th>Nombre Destinatario</th>
+            <th>Productos</th>
+            <th>Monto Total</th>
+            <th>Cantidad Productos</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var presupuesto in Model)
+        {
+            <tr>
+                <td>@presupuesto.IdPresupuesto</td>
+                <td>@presupuesto.NombreDestinatario</td>
+                <td>
+                    <ul>
+                        @foreach (var detalle in presupuesto.Detalle)
+                        {
+                            <li>@detalle.Producto.Descripcion - @String.Format("{0:C}", detalle.Producto.Precio) x @detalle.Cantidad</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    @String.Format("{0:C}", presupuesto.Detalle.Sum(d => d.Producto.Precio * d.Cantidad))
+                </td>
+                <td>@presupuesto.Detalle.Sum(d => d.Cantidad)</td>
+                <td>
+                    <a asp-action="ModificarPresupuesto" 
+                       asp-controller="Presupuesto" 
+                       asp-route-id="@presupuesto.IdPresupuesto" 
+                       class="btn btn-warning">
+                        Editar
+                    </a>
+                </td>
+                <td>
+                    <form asp-action="EliminarPresupuesto" 
+                        asp-controller="Presupuesto" 
+                        asp-route-id="@presupuesto.IdPresupuesto" 
+                        method="post" 
+                        style="display:inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este presupuesto?');">
+                        Eliminar
+                    </button>
+                </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
