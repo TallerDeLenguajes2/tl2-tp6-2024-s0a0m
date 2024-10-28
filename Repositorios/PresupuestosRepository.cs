@@ -63,7 +63,25 @@ public class PresupuestosRepository : IPresupuestosRepository
 
     public void EliminarPresupuesto(int id)
     {
-        throw new NotImplementedException();
+        var queryDetalle = "DELETE FROM PresupuestosDetalle WHERE idPresupuesto = @idPresupuesto";
+        var queryPresupuesto = "DELETE FROM Presupuestos WHERE idPresupuesto = @idPresupuesto";
+
+        using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
+        {
+            connection.Open();
+
+            using (var command = new SqliteCommand(queryDetalle, connection))
+            {
+                command.Parameters.Add(new SqliteParameter("@idPresupuesto", id));
+                command.ExecuteNonQuery();
+            }
+
+            using (var command = new SqliteCommand(queryPresupuesto, connection))
+            {
+                command.Parameters.Add(new SqliteParameter("@idPresupuesto", id));
+                command.ExecuteNonQuery();
+            }
+        }
     }
 
     public List<Presupuesto> ListarPresupuestos()
@@ -145,11 +163,9 @@ public class PresupuestosRepository : IPresupuestosRepository
                         );
                     } while (reader.Read());
                 }
-
             }
             connection.Close();
         }
         return presupuesto;
     }
-
 }

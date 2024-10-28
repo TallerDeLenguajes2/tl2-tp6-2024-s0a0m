@@ -16,5 +16,6 @@ public interface IProductoRepository
     public List<Producto> ListarProductos();
     public Producto DetalleProducto(int id);
     public void EliminarProducto(int id);
+    public Producto ObtenerPorId(int id);
     
 }

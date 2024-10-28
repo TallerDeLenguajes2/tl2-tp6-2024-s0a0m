@@ -30,7 +30,17 @@ public class ProductoRepository : IProductoRepository
 
     public void EliminarProducto(int id)
     {
-        throw new NotImplementedException();
+        var query = "DELETE FROM Productos WHERE idProducto = @idProducto";
+
+        using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
+        {
+            connection.Open();
+            using (var command = new SqliteCommand(query, connection))
+            {
+                command.Parameters.Add(new SqliteParameter("@idProducto", id));
+                command.ExecuteNonQuery();
+            }
+        }
     }
 
     public List<Producto> ListarProductos()
@@ -64,18 +74,47 @@ public class ProductoRepository : IProductoRepository
     public void ModificarProducto(int id, Producto producto)
     {
 
-        var query = $"UPDATE Productos SET Descripcion = @Descripcion WHERE idProducto = @idProducto ";
+        var query = $"UPDATE Productos SET Descripcion = @Descripcion, Precio = @Precio WHERE idProducto = @idProducto ";
         using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
         {
             connection.Open();
             var command = new SqliteCommand(query, connection);
 
             command.Parameters.Add(new SqliteParameter("@Descripcion", producto.Descripcion));
+            command.Parameters.Add(new SqliteParameter("@Precio", producto.Precio));
             command.Parameters.Add(new SqliteParameter("@idProducto", id));
 
             command.ExecuteNonQuery();
 
-            connection.Close();   
+            connection.Close();
         }
     }
+
+    public Producto ObtenerPorId(int id)
+    {
+        var producto = new Producto();
+        var query = "SELECT * FROM Productos WHERE idProducto = @idProducto";
+
+        using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
+        {
+            connection.Open();
+            using (var command = new SqliteCommand(query, connection))
+            {
+                command.Parameters.Add(new SqliteParameter("@idProducto", id));
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        producto.IdProducto = Convert.ToInt32(reader["idProducto"]);
+                        producto.Descripcion = reader["Descripcion"].ToString();
+                        producto.Precio = Convert.ToInt32(reader["Precio"]);
+                    }
+                }
+            }
+        }
+        return producto;
+    }
+
+    
 }
