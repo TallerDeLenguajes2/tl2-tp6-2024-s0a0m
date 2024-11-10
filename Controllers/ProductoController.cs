@@ -9,7 +9,7 @@ namespace tl2_tp6_2024_s0a0m.Controllers;
 public class ProductoController : Controller
 {
     private readonly ILogger<ProductoController> _logger;
-    readonly ProductoRepository productoR; 
+    readonly ProductoRepository productoR;
 
     public ProductoController(ILogger<ProductoController> logger)
     {
@@ -20,36 +20,41 @@ public class ProductoController : Controller
     public IActionResult Index()
     {
         var productos = productoR.ListarProductos();
-        return View(productos); 
+        return View(productos);
     }
 
-    [HttpGet("/CrearProducto")]
-    public IActionResult CrearProducto() {
+    [HttpGet("CrearProducto")]
+    public IActionResult CrearProducto()
+    {
         return View();
     }
 
-    [HttpPost("/CrearProducto")]
-    public IActionResult CrearProducto([FromForm] Producto producto) {
+    [HttpPost("CrearProducto")]
+    public IActionResult CrearProducto([FromForm] Producto producto)
+    {
         productoR.CrearProducto(producto);
-        return RedirectToAction("Index","Producto");
+        return RedirectToAction("Index", "Producto");
     }
 
-    [HttpGet("/ModificarProducto/{id}")]
-    public IActionResult ModificarProducto(int id) {
+    [HttpGet("ModificarProducto/{id}")]
+    public IActionResult ModificarProducto(int id)
+    {
         var producto = productoR.ObtenerPorId(id);
         return producto == default(Producto) ? RedirectToAction("Index", "Producto") : View(producto);
     }
 
-    [HttpPost("/ModificarProducto/{id}")]
-    public IActionResult ModificarProducto([FromForm] Producto producto, int id) {
+    [HttpPost("ModificarProducto/{id}")]
+    public IActionResult ModificarProducto([FromForm] Producto producto, int id)
+    {
         productoR.ModificarProducto(id, producto);
-        return RedirectToAction("Index","Producto");
+        return RedirectToAction("Index", "Producto");
     }
 
-    [HttpPost("/EliminarProducto/{id}")]
-    public IActionResult EliminarProducto(int id) {
+    [HttpPost("EliminarProducto/{id}")]
+    public IActionResult EliminarProducto(int id)
+    {
         productoR.EliminarProducto(id);
-        return RedirectToAction("Index","Producto");
+        return RedirectToAction("Index", "Producto");
     }
 
     public IActionResult Privacy()
