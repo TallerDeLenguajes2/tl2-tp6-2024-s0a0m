@@ -10,11 +10,13 @@ public class PresupuestoController : Controller
 {
     private readonly ILogger<PresupuestoController> _logger;
     readonly PresupuestosRepository presupuestoR;
+    readonly ProductoRepository productoR;
 
     public PresupuestoController(ILogger<PresupuestoController> logger)
     {
         _logger = logger;
         presupuestoR = new();
+        productoR = new();
     }
     [HttpGet]
     public IActionResult Index()
@@ -29,7 +31,7 @@ public class PresupuestoController : Controller
         return View();
     }
 
-    [HttpPost("/CrearPresupuesto")]
+    [HttpPost("CrearPresupuesto")]
     public IActionResult CrearPresupuesto([FromForm] Presupuesto presupuesto)
     {
         presupuestoR.CrearPresupuesto(presupuesto);
@@ -40,13 +42,13 @@ public class PresupuestoController : Controller
     public IActionResult ModificarPresupuesto(int id)
     {
         var presupuesto = presupuestoR.ObtenerPresupuesto(id);
-        return presupuesto == default(Presupuesto) ? RedirectToAction("Index", "Presupuesto") : View(presupuesto);
+        return presupuesto.IdPresupuesto == 0 ? RedirectToAction("Index", "Presupuesto") : View(presupuesto);
     }
 
     [HttpPost("ModificarPresupuesto/{id}")]
-    public IActionResult ModificarPresupuesto([FromForm] Producto presupuesto, int id)
+    public IActionResult ModificarPresupuesto([FromForm] Presupuesto presupuesto, int id)
     {
-        // presupuestoR.ModificarProducto(id, producto);
+        presupuestoR.ModificarProducto(id, presupuesto);
         return RedirectToAction("Index", "Presupuesto");
     }
 
@@ -57,10 +59,16 @@ public class PresupuestoController : Controller
         return RedirectToAction("Index", "Presupuesto");
     }
 
-    public IActionResult Privacy()
+    [HttpGet("AgregarPresupuestoDetalle")]
+    public IActionResult AgregarPresupuestoDetalle(int index)
     {
-        return View();
+        var detalle = new PresupuestoDetalle(); // Crear un detalle vacío
+        ViewData["Productos"] = productoR.ListarProductos(); // Obtener los productos
+
+        ViewBag.Index = index; // Pasar el índice a la vista parcial
+        return PartialView("_PresupuestoDetalleForm", detalle); // Renderizar la vista parcial
     }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

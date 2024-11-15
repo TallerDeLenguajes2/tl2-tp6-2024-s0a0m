@@ -131,9 +131,26 @@ public class PresupuestosRepository : IPresupuestosRepository
         return presupuestos;
     }
 
+    public void ModificarProducto(int id, Presupuesto presupuesto)
+    {
+        var query = $"UPDATE Presupuestos SET NombreDestinatario = @NombreDestinatario WHERE idPresupuesto = @idPresupuesto ";
+        using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
+        {
+            connection.Open();
+            var command = new SqliteCommand(query, connection);
+
+            command.Parameters.Add(new SqliteParameter("@NombreDestinatario", presupuesto.NombreDestinatario));
+            command.Parameters.Add(new SqliteParameter("@idPresupuesto", id));
+
+            command.ExecuteNonQuery();
+
+            connection.Close();
+        }
+    }
+
     public Presupuesto ObtenerPresupuesto(int id)
     {
-        var query = @"SELECT * FROM Presupuestos INNER JOIN PresupuestosDetalle USING(idPresupuesto) INNER JOIN Productos USING (idProducto) WHERE idPresupuesto = @idPresupuesto";
+        var query = @"SELECT * FROM Presupuestos LEFT JOIN PresupuestosDetalle USING(idPresupuesto) LEFT JOIN Productos USING (idProducto) WHERE idPresupuesto = @idPresupuesto";
         var presupuesto = new Presupuesto();
         using (var connection = new SqliteConnection(cadenaConexion))
         {
@@ -146,6 +163,12 @@ public class PresupuestosRepository : IPresupuestosRepository
                 {
                     presupuesto.NombreDestinatario = reader["NombreDestinatario"].ToString();
                     presupuesto.IdPresupuesto = Convert.ToInt32(reader["IdPresupuesto"]);
+
+                    if (reader["idProducto"] == DBNull.Value)
+                    {
+                        connection.Close();
+                        return presupuesto;
+                    }
 
                     do
                     {

@@ -6,36 +6,40 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<form asp-action="CrearPresupuesto" method="post">
+<form asp-action="CrearPresupuesto" method="post" id="presupuestoForm">
     <div class="form-group">
         <label for="NombreDestinatario">Nombre Destinatario</label>
         <input asp-for="NombreDestinatario" class="form-control" id="NombreDestinatario" required />
         <span asp-validation-for="NombreDestinatario" class="text-danger"></span>
     </div>
 
-    @* <h3>Detalles del Presupuesto</h3>
-
+    <h3>Detalles del Presupuesto</h3>
     <div id="detallePresupuesto">
-        <div class="form-group">
-            <label for="Producto_0">Producto</label>
-            <select name="Detalle[0].ProductoId" class="form-control" required>
-                <option value="">Seleccionar Producto</option>
-                @foreach (var producto in ViewData["Productos"] as List<tl2_tp6_2024_s0a0m.Models.Producto>)
-                {
-                    <option value="@producto.IdProducto">@producto.Descripcion - @String.Format("{0:C}", producto.Precio)</option>
-                }
-            </select>
-            <span class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label for="Cantidad_0">Cantidad</label>
-            <input type="number" name="Detalle[0].Cantidad" class="form-control" required min="1" />
-            <span class="text-danger"></span>
-        </div>
+        <!-- Los detalles se agregarán dinámicamente aquí -->
     </div>
 
-    <button type="button" id="addProducto" class="btn btn-secondary mb-3">Agregar Producto</button> *@
+    <button type="button" id="addDetalle" class="btn btn-secondary mb-3">Agregar Detalle</button>
 
     <button type="submit" class="btn btn-primary">Crear Presupuesto</button>
 </form>
+
+
+<script>
+    let index = 0;  // Índice inicial para los detalles
+
+    // Función para agregar un nuevo detalle
+    document.getElementById('addDetalle').addEventListener('click', function () {
+        const url = '/Presupuesto/AgregarPresupuestoDetalle?index=' + index;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                const detallePresupuesto = document.getElementById('detallePresupuesto');
+                detallePresupuesto.insertAdjacentHTML('beforeend', html);
+                index++;  // Incrementar el índice después de agregar un nuevo detalle
+            })
+            .catch(error => console.error('Error al agregar detalle:', error));
+    });
+
+
+</script>

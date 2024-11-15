@@ -40,7 +40,7 @@ public class ProductoController : Controller
     public IActionResult ModificarProducto(int id)
     {
         var producto = productoR.ObtenerPorId(id);
-        return producto == default(Producto) ? RedirectToAction("Index", "Producto") : View(producto);
+        return producto.IdProducto == 0 ? RedirectToAction("Index", "Producto") : View(producto);
     }
 
     [HttpPost("ModificarProducto/{id}")]

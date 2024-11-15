@@ -17,5 +17,6 @@ public interface IPresupuestosRepository
     public void AgregarProductoYCantidad(int id);
     public void EliminarPresupuesto(int id);
     public Presupuesto ObtenerPresupuesto(int id);
+    public void ModificarProducto(int id, Presupuesto presupuesto);
 
 }
