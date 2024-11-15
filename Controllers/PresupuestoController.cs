@@ -35,6 +35,12 @@ public class PresupuestoController : Controller
     public IActionResult CrearPresupuesto([FromForm] Presupuesto presupuesto)
     {
         presupuestoR.CrearPresupuesto(presupuesto);
+        // hacer un metodo en el repositorio de presupuesto que reciba un objecto presupuesto con los detalles y cree todo junto
+        var idPresupuesto = presupuestoR.ListarPresupuestos().MaxBy(p => p.IdPresupuesto).IdPresupuesto;
+        for (int i = 0; i < presupuesto.Detalle.Count; i++)
+        {
+            presupuestoR.AgregarProductoYCantidad(idPresupuesto, presupuesto.Detalle[i].Producto.IdProducto, presupuesto.Detalle[i].Cantidad);
+        }
         return RedirectToAction("Index", "Presupuesto");
     }
 
@@ -62,11 +68,11 @@ public class PresupuestoController : Controller
     [HttpGet("AgregarPresupuestoDetalle")]
     public IActionResult AgregarPresupuestoDetalle(int index)
     {
-        var detalle = new PresupuestoDetalle(); // Crear un detalle vacío
-        ViewData["Productos"] = productoR.ListarProductos(); // Obtener los productos
+        var detalle = new PresupuestoDetalle();
+        ViewData["Productos"] = productoR.ListarProductos(); 
 
-        ViewBag.Index = index; // Pasar el índice a la vista parcial
-        return PartialView("_PresupuestoDetalleForm", detalle); // Renderizar la vista parcial
+        ViewBag.Index = index; 
+        return PartialView("_PresupuestoDetalleForm", detalle);
     }
 
 

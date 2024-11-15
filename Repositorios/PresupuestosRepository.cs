@@ -6,21 +6,32 @@ namespace tl2_tp6_2024_s0a0m.Repositorios;
 public class PresupuestosRepository : IPresupuestosRepository
 {
     private string cadenaConexion = "Data Source=DB/Tienda.db;Cache=Shared";
-    public void AgregarProductoYCantidad(int id)
+    public void AgregarProductoYCantidad(int idPresupuesto, int idProducto, int cantidad)
     {
-        throw new NotImplementedException();
+        var query = "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idPresupuesto, @idProducto, @Cantidad)";
+
+            using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
+            {
+                connection.Open();
+                using (var command = new SqliteCommand(query, connection))
+                {
+                    command.Parameters.Add(new SqliteParameter("@idPresupuesto", idPresupuesto));
+                    command.Parameters.Add(new SqliteParameter("@idProducto", idProducto));
+                    command.Parameters.Add(new SqliteParameter("@Cantidad", cantidad));
+                    command.ExecuteNonQuery();
+                }
+            }
     }
 
     public void CrearPresupuesto(Presupuesto presupuesto)
     {
-        var query = $"INSERT INTO Presupuestos (idPresupuesto, NombreDestinatario, FechaCreacion) VALUES (@idPresupuesto, @NombreDestinatario, @FechaCreacion)";
+        var query = $"INSERT INTO Presupuestos (NombreDestinatario, FechaCreacion) VALUES (@NombreDestinatario, @FechaCreacion)";
         using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
         {
             connection.Open();
             var command = new SqliteCommand(query, connection);
             string fechaActual = DateTime.Now.ToString("yyyy-MM-dd");
 
-            command.Parameters.Add(new SqliteParameter("@idPresupuesto", presupuesto.IdPresupuesto));
             command.Parameters.Add(new SqliteParameter("@NombreDestinatario", presupuesto.NombreDestinatario));
             command.Parameters.Add(new SqliteParameter("@FechaCreacion", fechaActual));
 
@@ -86,7 +97,7 @@ public class PresupuestosRepository : IPresupuestosRepository
 
     public List<Presupuesto> ListarPresupuestos()
     {
-        var queryString = @"SELECT * FROM Presupuestos  LEFT JOIN PresupuestosDetalle USING(idPresupuesto) LEFT JOIN Productos USING(idProducto) ORDER BY idPresupuesto;";
+        var queryString = @"SELECT * FROM Presupuestos LEFT JOIN PresupuestosDetalle USING(idPresupuesto) LEFT JOIN Productos USING(idProducto) ORDER BY idPresupuesto;";
         List<Presupuesto> presupuestos = new();
         using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
         {
@@ -108,6 +119,21 @@ public class PresupuestosRepository : IPresupuestosRepository
                         presupuesto.NombreDestinatario = reader["NombreDestinatario"].ToString();
                         presupuesto.IdPresupuesto = idPresupuesto;
                         presupuestos.Add(presupuesto);
+
+
+                        var detallePresupuesto = new PresupuestoDetalle
+                        {
+                            Producto = new Producto
+                            {
+                                IdProducto = Convert.ToInt32(reader["idProducto"]),
+                                Descripcion = reader["Descripcion"].ToString(),
+                                Precio = Convert.ToInt32(reader["Precio"])
+                            },
+                            Cantidad = Convert.ToInt32(reader["Cantidad"])
+                        };
+                        presupuestos.Last().Detalle.Add(detallePresupuesto);
+                        
+
                         idPresupuestoActual = idPresupuesto;
                     }
                     else
