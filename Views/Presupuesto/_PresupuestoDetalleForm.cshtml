@@ -2,20 +2,22 @@
 
 <div class="detalle-item">
     <div class="form-group">
-        <label for="Producto_@ViewBag.Index">Producto</label>
-        <select name="Detalle[@ViewBag.Index].Producto.IdProducto" class="form-control" required>
+        <label for="Producto_@ViewData["Index"]">Producto</label>
+        <select name="Detalle[@ViewData["Index"]].Producto.IdProducto" class="form-control" required>
             <option value="">Seleccionar Producto</option>
             @foreach (var producto in ViewData["Productos"] as List<tl2_tp6_2024_s0a0m.Models.Producto>)
             {
-                <option value="@producto.IdProducto">@producto.Descripcion - @String.Format("{0:C}", producto.Precio)
+                <option value="@producto.IdProducto">
+                    @producto.Descripcion - @String.Format("{0:C}", producto.Precio)
                 </option>
             }
         </select>
     </div>
 
     <div class="form-group">
-        <label for="Cantidad_@ViewBag.Index">Cantidad</label>
-        <input type="number" name="Detalle[@ViewBag.Index].Cantidad" class="form-control" required min="1" />
+        <label for="Cantidad_@ViewData["Index"]">Cantidad</label>
+        <input type="number" name="Detalle[@ViewData["Index"]].Cantidad" value="1" class="form-control" required
+            min="1" />
     </div>
 
     <button type="button" class="removeDetalle btn btn-danger">Eliminar</button>

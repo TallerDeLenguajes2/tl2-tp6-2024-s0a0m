@@ -7,7 +7,8 @@ namespace tl2_tp6_2024_s0a0m.Repositorios;
 public class ProductoRepository : IProductoRepository
 {
     private string cadenaConexion = "Data Source=DB/Tienda.db;Cache=Shared";
-    public void CrearProducto(Producto producto) {
+    public void CrearProducto(Producto producto)
+    {
         var query = $"INSERT INTO Productos (Descripcion, Precio) VALUES (@Descripcion, @Precio)";
         using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
         {
@@ -19,7 +20,7 @@ public class ProductoRepository : IProductoRepository
 
             command.ExecuteNonQuery();
 
-            connection.Close();   
+            connection.Close();
         }
     }
 
@@ -30,12 +31,18 @@ public class ProductoRepository : IProductoRepository
 
     public void EliminarProducto(int id)
     {
-        var query = "DELETE FROM Productos WHERE idProducto = @idProducto";
-
+        var deleteDetallesQuery = "DELETE FROM PresupuestosDetalle WHERE idProducto = @idProducto;";
+        var deleteProductoQuery = "DELETE FROM Productos WHERE idProducto = @idProducto;";
         using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
         {
             connection.Open();
-            using (var command = new SqliteCommand(query, connection))
+            using (var command = new SqliteCommand(deleteDetallesQuery, connection))
+            {
+                command.Parameters.Add(new SqliteParameter("@idProducto", id));
+                command.ExecuteNonQuery();
+            }
+
+            using (var command = new SqliteCommand(deleteProductoQuery, connection))
             {
                 command.Parameters.Add(new SqliteParameter("@idProducto", id));
                 command.ExecuteNonQuery();
@@ -47,28 +54,28 @@ public class ProductoRepository : IProductoRepository
     {
         var queryString = @"SELECT * FROM Productos;";
         List<Producto> productos = new();
-            using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
+        using (SqliteConnection connection = new SqliteConnection(cadenaConexion))
+        {
+            SqliteCommand command = new SqliteCommand(queryString, connection);
+            connection.Open();
+
+            using (SqliteDataReader reader = command.ExecuteReader())
             {
-                SqliteCommand command = new SqliteCommand(queryString, connection);
-                connection.Open();
-            
-                using(SqliteDataReader reader = command.ExecuteReader())
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                        var producto = new Producto();
-                        producto.IdProducto = Convert.ToInt32(reader["idProducto"]);
-                        producto.Precio = Convert.ToInt32(reader["Precio"]);
-                        producto.Descripcion = reader["Descripcion"].ToString();
+                    var producto = new Producto();
+                    producto.IdProducto = Convert.ToInt32(reader["idProducto"]);
+                    producto.Precio = Convert.ToInt32(reader["Precio"]);
+                    producto.Descripcion = reader["Descripcion"].ToString();
 
-                        // hacer el *** while
+                    // hacer el *** while
 
-                        productos.Add(producto);
-                    }
+                    productos.Add(producto);
                 }
-                connection.Close();
             }
-            return productos;
+            connection.Close();
+        }
+        return productos;
     }
 
     public void ModificarProducto(int id, Producto producto)
@@ -116,5 +123,5 @@ public class ProductoRepository : IProductoRepository
         return producto;
     }
 
-    
+
 }

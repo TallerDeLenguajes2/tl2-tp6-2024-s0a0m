@@ -1,0 +1,98 @@
+@model tl2_tp6_2024_s0a0m.Models.Presupuesto
+
+@{
+    ViewData["Title"] = "Modificar Presupuesto";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="ModificarPresupuesto" method="post">
+    <input type="hidden" asp-for="IdPresupuesto" />
+
+    <div class="form-group">
+        <label for="NombreDestinatario">Nombre del Destinatario</label>
+        <input asp-for="NombreDestinatario" class="form-control" id="NombreDestinatario" required />
+        <span asp-validation-for="NombreDestinatario" class="text-danger"></span>
+    </div>
+
+    <h3>Detalles del Presupuesto</h3>
+    <div id="detallePresupuesto">
+        @for (int i = 0; i < Model.Detalle.Count; i++)
+        {
+            <div class="detalle-item">
+                <div class="form-group">
+                    <label for="Producto_@i">Producto</label>
+                    <select name="Detalle[@i].Producto.IdProducto" class="form-control" required>
+                        <option value="">Seleccionar Producto</option>
+                        @foreach (var producto in ViewData["Productos"] as List<tl2_tp6_2024_s0a0m.Models.Producto>)
+                        {
+                            <option value="@producto.IdProducto"
+                                selected="@(Model.Detalle[i].Producto != null && producto.IdProducto == Model.Detalle[i].Producto.IdProducto)">
+                                @producto.Descripcion - @String.Format("{0:C}", producto.Precio)
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="Cantidad_@i">Cantidad</label>
+                    <input type="number" name="Detalle[@i].Cantidad" value="@Model.Detalle[i].Cantidad" class="form-control"
+                        required min="1" />
+                </div>
+
+                <button type="button" class="removeDetalle btn btn-danger">Eliminar</button>
+            </div>
+        }
+    </div>
+
+    <button type="button" id="addDetalle" class="btn btn-secondary mb-3">Agregar Detalle</button>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>
+
+<script>
+    let index = @Model.Detalle.Count; // Índice inicial basado en la cantidad de detalles existentes
+
+    // Función para agregar un nuevo detalle
+    document.getElementById('addDetalle').addEventListener('click', function () {
+        const url = '/Presupuesto/AgregarPresupuestoDetalle?index=' + index;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                const detallePresupuesto = document.getElementById('detallePresupuesto');
+                detallePresupuesto.insertAdjacentHTML('beforeend', html);
+                index++; // Incrementar el índice después de agregar un nuevo detalle
+            })
+            .catch(error => console.error('Error al agregar detalle:', error));
+    });
+
+    // Función para eliminar un detalle dinámicamente y reindexar
+    document.getElementById('detallePresupuesto').addEventListener('click', function (event) {
+        if (event.target.classList.contains('removeDetalle')) {
+            const detalleItem = event.target.closest('.detalle-item');
+            if (detalleItem) {
+                // Eliminar el detalle visualmente
+                detalleItem.remove();
+
+                // Reindexar todos los elementos después de eliminar
+                const detalleItems = document.querySelectorAll('#detallePresupuesto .detalle-item');
+                detalleItems.forEach((item, newIndex) => {
+                    // Actualizar los atributos name de cada elemento
+                    const selectProducto = item.querySelector('select[name^="Detalle"]');
+                    const inputCantidad = item.querySelector('input[name^="Detalle"]');
+
+                    if (selectProducto) {
+                        selectProducto.name = `Detalle[${newIndex}].Producto.IdProducto`;
+                    }
+                    if (inputCantidad) {
+                        inputCantidad.name = `Detalle[${newIndex}].Cantidad`;
+                    }
+                });
+
+                // Actualizar el índice global
+                index = detalleItems.length;
+            }
+        }
+    });
+</script>

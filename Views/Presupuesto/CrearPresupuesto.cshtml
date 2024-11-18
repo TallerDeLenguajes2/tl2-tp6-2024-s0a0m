@@ -23,11 +23,10 @@
     <button type="submit" class="btn btn-primary">Crear Presupuesto</button>
 </form>
 
-
 <script>
-    let index = 0;  // Índice inicial para los detalles
+    let index = 0;
 
-    // Función para agregar un nuevo detalle
+    // Agregar un nuevo detalle dinámicamente
     document.getElementById('addDetalle').addEventListener('click', function () {
         const url = '/Presupuesto/AgregarPresupuestoDetalle?index=' + index;
 
@@ -36,10 +35,35 @@
             .then(html => {
                 const detallePresupuesto = document.getElementById('detallePresupuesto');
                 detallePresupuesto.insertAdjacentHTML('beforeend', html);
-                index++;  // Incrementar el índice después de agregar un nuevo detalle
+                index++;
             })
             .catch(error => console.error('Error al agregar detalle:', error));
     });
 
+    // Eliminar un detalle dinámicamente y reindexar
+    document.getElementById('detallePresupuesto').addEventListener('click', function (event) {
+        if (event.target.classList.contains('removeDetalle')) {
+            const detalleItem = event.target.closest('.detalle-item');
+            if (detalleItem) {
+                detalleItem.remove();
 
+                // Reindexar los nombres de los detalles restantes
+                const detalleItems = document.querySelectorAll('#detallePresupuesto .detalle-item');
+                detalleItems.forEach((item, newIndex) => {
+                    const selectProducto = item.querySelector('select[name^="Detalle"]');
+                    const inputCantidad = item.querySelector('input[name^="Detalle"]');
+
+                    if (selectProducto) {
+                        selectProducto.name = `Detalle[${newIndex}].Producto.IdProducto`;
+                    }
+                    if (inputCantidad) {
+                        inputCantidad.name = `Detalle[${newIndex}].Cantidad`;
+                    }
+                });
+
+                // Actualizar el índice global
+                index = detalleItems.length;
+            }
+        }
+    });
 </script>
