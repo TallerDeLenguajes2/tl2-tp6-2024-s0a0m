@@ -52,4 +52,3 @@ FROM
 --borra producto de presupuesto producto
 DELETE FROM PresupuestosDetalle
 WHERE idPresupuesto = [idPresupuesto] AND idProducto = [idProducto];
-
