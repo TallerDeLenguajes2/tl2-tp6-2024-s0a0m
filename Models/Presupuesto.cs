@@ -4,12 +4,13 @@ public class Presupuesto
 {
 
     public int IdPresupuesto { get; set; }
-    public string NombreDestinatario { get; set; }
+    public Cliente Cliente { get; set; }
     public List<PresupuestoDetalle> Detalle { get; set; }
 
     public Presupuesto()
     {
         Detalle = new List<PresupuestoDetalle>();
+        Cliente = new Cliente();
     }
 
     public void MontoPresupuesto()
