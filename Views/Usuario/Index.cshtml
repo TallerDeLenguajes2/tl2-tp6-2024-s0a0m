@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Formulario Login";
+}
+
+
+<h2 class="text-center">@ViewData["Title"]</h2>
+
+@model tl2_tp6_2024_s0a0m.ViewModels.UsuarioViewModel
+
+<!-- Mostrar mensaje de error si existe -->
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @Model.ErrorMessage
+    </div>
+}
+
+<div class="mb-3 d-flex justify-content-center">
+    <form asp-controller="Usuario" asp-action="Login" autocomplete="off" class="card bg-dark border-secondary p-4"
+        style="max-width: 500px; width: 100%;">
+        <h2 class="text-center text-light">Iniciar Sesión</h2>
+        <div class="mb-3">
+            <label for="nombreUsuario" class="form-label text-light">NombreUsuario</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary" id="nombreUsuario"
+                asp-for="NombreUsuario" required>
+        </div>
+        <div class="mb-3">
+            <label for="contraseña" class="form-label text-light">Contraseña</label>
+            <input type="password" class="form-control bg-dark text-light border-secondary" id="contraseña"
+                asp-for="Contrasena" required>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-success w-50 efecto-hover">
+                <i class="far fa-sign-in"></i>
+            </button>
+        </div>
+    </form>
+</div>

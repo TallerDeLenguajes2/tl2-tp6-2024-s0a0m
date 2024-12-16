@@ -23,7 +23,7 @@ SET Descripcion = 'Teclado Mecánico Logitech',
 WHERE idProducto = 3;
 
 -- lista 1 presupuesto con su detalle de productos
-SELECT 
+SELECT
     P.idPresupuesto,
     P.NombreDestinatario,
     P.FechaCreacion,

@@ -1,4 +1,4 @@
-@model tl2_tp6_2024_s0a0m.Models.Producto
+@model tl2_tp6_2024_s0a0m.ViewModels.ProductoViewModel
 
 @{
     ViewData["Title"] = "Crear Producto";
@@ -22,19 +22,3 @@
 
     <button type="submit" class="btn btn-primary">Crear Producto</button>
 </form>
-
-<!-- Mostrar errores de validación si los hay -->
-@*
-@if (!ViewData.ModelState.IsValid)
- {
-    <div class="alert alert-danger mt-3">
-        <ul>
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <li>@error.ErrorMessage</li>
-            }
-        </ul>
-    </div>
-    
-} 
-*@

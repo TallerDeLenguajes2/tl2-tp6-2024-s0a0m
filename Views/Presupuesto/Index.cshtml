@@ -14,7 +14,7 @@
     <thead>
         <tr>
             <th>ID Presupuesto</th>
-            <th>Nombre Destinatario</th>
+            @* <th>Nombre Destinatario</th> *@
             <th>Productos</th>
             <th>Monto Total</th>
             <th>Cantidad Productos</th>
@@ -25,12 +25,13 @@
         {
             <tr>
                 <td>@presupuesto.IdPresupuesto</td>
-                <td>@presupuesto.NombreDestinatario</td>
+                @* <td>@presupuesto.NombreDestinatario</td> *@
                 <td>
                     <ul>
                         @foreach (var detalle in presupuesto.Detalle)
                         {
-                            <li>@detalle.Producto.Descripcion - @String.Format("{0:C}", detalle.Producto.Precio) x @detalle.Cantidad</li>
+                            <li>@detalle.Producto.Descripcion - @String.Format("{0:C}", detalle.Producto.Precio) x
+                                @detalle.Cantidad</li>
                         }
                     </ul>
                 </td>
@@ -39,23 +40,19 @@
                 </td>
                 <td>@presupuesto.Detalle.Sum(d => d.Cantidad)</td>
                 <td>
-                    <a asp-action="ModificarPresupuesto" 
-                       asp-controller="Presupuesto" 
-                       asp-route-id="@presupuesto.IdPresupuesto" 
-                       class="btn btn-warning">
+                    <a asp-action="ModificarPresupuesto" asp-controller="Presupuesto"
+                        asp-route-id="@presupuesto.IdPresupuesto" class="btn btn-warning">
                         Editar
                     </a>
                 </td>
                 <td>
-                    <form asp-action="EliminarPresupuesto" 
-                        asp-controller="Presupuesto" 
-                        asp-route-id="@presupuesto.IdPresupuesto" 
-                        method="post" 
-                        style="display:inline;">
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este presupuesto?');">
-                        Eliminar
-                    </button>
-                </form>
+                    <form asp-action="EliminarPresupuesto" asp-controller="Presupuesto"
+                        asp-route-id="@presupuesto.IdPresupuesto" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('¿Estás seguro de que deseas eliminar este presupuesto?');">
+                            Eliminar
+                        </button>
+                    </form>
                 </td>
             </tr>
         }

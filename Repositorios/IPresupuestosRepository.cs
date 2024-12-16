@@ -7,9 +7,9 @@ public interface IPresupuestosRepository
     public List<PresupuestoDetalle> DetallePresupuesto(int id);
     public void AgregarProductoYCantidad(int idPresupuesto, int idProducto, int cantidad);
     public void EliminarPresupuesto(int id);
-    public Presupuesto ObtenerPresupuesto(int id);
-    public void ModificarProducto(int id, Presupuesto presupuesto);
+    public Presupuesto ObtenerPorId(int id);
     public void ModificarDetalle(int idProducto, int idPresupuesto, int cantidadNueva);
     public void EliminarDetalle(PresupuestoDetalle detalle, int idPresupuesto);
+    public void ModificarCliente(int idPresupeusto, int idCliente);
 
 }

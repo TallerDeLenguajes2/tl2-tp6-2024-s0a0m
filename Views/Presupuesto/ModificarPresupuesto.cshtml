@@ -1,4 +1,4 @@
-@model tl2_tp6_2024_s0a0m.Models.Presupuesto
+@model tl2_tp6_2024_s0a0m.ViewModels.ModificarPresupuestoViewModel
 
 @{
     ViewData["Title"] = "Modificar Presupuesto";
@@ -7,12 +7,17 @@
 <h1>@ViewData["Title"]</h1>
 
 <form asp-action="ModificarPresupuesto" method="post">
-    <input type="hidden" asp-for="IdPresupuesto" />
-
+    <input type="hidden" asp-for="PresupuestoId" />
     <div class="form-group">
-        <label for="NombreDestinatario">Nombre del Destinatario</label>
-        <input asp-for="NombreDestinatario" class="form-control" id="NombreDestinatario" required />
-        <span asp-validation-for="NombreDestinatario" class="text-danger"></span>
+        <label for="ClienteId">Cliente</label>
+        <select asp-for="ClienteId" class="form-control" required>
+            <option value="">Seleccione un cliente</option>
+            @foreach (var cliente in Model.Clientes)
+            {
+                <option value="@cliente.ClienteId">@cliente.Nombre</option>
+            }
+        </select>
+        <span asp-validation-for="ClienteId" class="text-danger"></span>
     </div>
 
     <h3>Detalles del Presupuesto</h3>
@@ -21,17 +26,22 @@
         {
             <div class="detalle-item">
                 <div class="form-group">
-                    <label for="Producto_@i">Producto</label>
-                    <select name="Detalle[@i].Producto.IdProducto" class="form-control" required>
-                        <option value="">Seleccionar Producto</option>
-                        @foreach (var producto in ViewData["Productos"] as List<tl2_tp6_2024_s0a0m.Models.Producto>)
-                        {
-                            <option value="@producto.IdProducto"
-                                selected="@(Model.Detalle[i].Producto != null && producto.IdProducto == Model.Detalle[i].Producto.IdProducto)">
-                                @producto.Descripcion - @String.Format("{0:C}", producto.Precio)
-                            </option>
-                        }
-                    </select>
+                    <label for="IdProducto_@i">Producto</label>
+                    @if (Model.Productos.Count > 0)
+                    {
+                        <select asp-for="Detalle[@i].IdProducto" class="form-control" required>
+                            <option value="">Seleccione un producto</option>
+                            @foreach (var producto in Model.Productos)
+                            {
+                                <option value="@producto.IdProducto">@producto.Descripcion</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <p class="text-danger">No hay productos disponibles.</p>
+                    }
+
                 </div>
 
                 <div class="form-group">
@@ -55,7 +65,7 @@
 
     // Función para agregar un nuevo detalle
     document.getElementById('addDetalle').addEventListener('click', function () {
-        const url = '/Presupuesto/AgregarPresupuestoDetalle?index=' + index;
+        const url = '/AgregarPresupuestoDetalle?index=' + index;
 
         fetch(url)
             .then(response => response.text())
@@ -83,9 +93,11 @@
                     const inputCantidad = item.querySelector('input[name^="Detalle"]');
 
                     if (selectProducto) {
-                        selectProducto.name = `Detalle[${newIndex}].Producto.IdProducto`;
+                        // Asegurarse de que el campo select tenga el índice correcto
+                        selectProducto.name = `Detalle[${newIndex}].IdProducto`;
                     }
                     if (inputCantidad) {
+                        // Asegurarse de que el campo cantidad tenga el índice correcto
                         inputCantidad.name = `Detalle[${newIndex}].Cantidad`;
                     }
                 });

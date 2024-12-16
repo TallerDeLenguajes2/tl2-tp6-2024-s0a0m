@@ -2,6 +2,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using tl2_tp6_2024_s0a0m.Models;
 using tl2_tp6_2024_s0a0m.Repositorios;
+using tl2_tp6_2024_s0a0m.ViewModels;
+using tl2_tp6_2024_s0a0m.Filters;
 
 namespace tl2_tp6_2024_s0a0m.Controllers;
 
@@ -9,57 +11,127 @@ namespace tl2_tp6_2024_s0a0m.Controllers;
 public class ProductoController : Controller
 {
     private readonly ILogger<ProductoController> _logger;
-    readonly ProductoRepository productoR;
+    private readonly IProductoRepository _productoR;
 
-    public ProductoController(ILogger<ProductoController> logger)
+    public ProductoController(ILogger<ProductoController> logger, IProductoRepository productoR)
     {
         _logger = logger;
-        productoR = new();
+        _productoR = productoR;
     }
+
     [HttpGet]
+    [AccessLevelAuthorize("Administrador", "Cliente")]
     public IActionResult Index()
     {
-        var productos = productoR.ListarProductos();
-        return View(productos);
+        try
+        {
+            var productos = _productoR.ListarProductos();
+            return View(productos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString(), "Error al listar productos.");
+            return RedirectToAction("Error");
+        }
     }
 
     [HttpGet("CrearProducto")]
+    [AccessLevelAuthorize("Administrador")]
     public IActionResult CrearProducto()
     {
-        return View();
+        try
+        {
+            return View();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString(), "Error al cargar la vista de creación de producto.");
+            return RedirectToAction("Error");
+        }
     }
 
     [HttpPost("CrearProducto")]
-    public IActionResult CrearProducto([FromForm] Producto producto)
+    [AccessLevelAuthorize("Administrador")]
+    public IActionResult CrearProducto([FromForm] ProductoViewModel productoViewModel)
     {
-        productoR.CrearProducto(producto);
-        return RedirectToAction("Index", "Producto");
+        try
+        {
+            if (!ModelState.IsValid) return View(productoViewModel);
+
+            var producto = new Producto
+            {
+                Descripcion = productoViewModel.Descripcion,
+                Precio = productoViewModel.Precio
+            };
+            _productoR.CrearProducto(producto);
+
+            return RedirectToAction("Index", "Producto");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString(), "Error al crear un nuevo producto.");
+            return RedirectToAction("Error");
+        }
     }
 
     [HttpGet("ModificarProducto/{id}")]
+    [AccessLevelAuthorize("Administrador")]
     public IActionResult ModificarProducto(int id)
     {
-        var producto = productoR.ObtenerPorId(id);
-        return producto.IdProducto == 0 ? RedirectToAction("Index", "Producto") : View(producto);
+        try
+        {
+            var producto = _productoR.ObtenerPorId(id);
+            if (producto == null || producto.IdProducto == 0)
+                return RedirectToAction("Index", "Producto");
+
+            var viewModel = new ProductoViewModel(producto);
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString(), $"Error al cargar la vista de modificación para el producto con ID {id}.");
+            return RedirectToAction("Error");
+        }
     }
 
     [HttpPost("ModificarProducto/{id}")]
-    public IActionResult ModificarProducto([FromForm] Producto producto, int id)
+    [AccessLevelAuthorize("Administrador")]
+    public IActionResult ModificarProducto([FromForm] ProductoViewModel productoViewModel, int id)
     {
-        productoR.ModificarProducto(id, producto);
-        return RedirectToAction("Index", "Producto");
+        try
+        {
+            if (!ModelState.IsValid) return View(productoViewModel);
+
+            var producto = new Producto
+            {
+                Descripcion = productoViewModel.Descripcion,
+                Precio = productoViewModel.Precio
+            };
+
+            _productoR.ModificarProducto(id, producto);
+            return RedirectToAction("Index", "Producto");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString(), $"Error al modificar el producto con ID {id}.");
+            return RedirectToAction("Error");
+        }
     }
 
     [HttpPost("EliminarProducto/{id}")]
+    [AccessLevelAuthorize("Administrador")]
     public IActionResult EliminarProducto(int id)
     {
-        productoR.EliminarProducto(id);
-        return RedirectToAction("Index", "Producto");
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
+        try
+        {
+            _productoR.EliminarProducto(id);
+            return RedirectToAction("Index", "Producto");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString(), $"Error al eliminar el producto con ID {id}.");
+            return RedirectToAction("Error");
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

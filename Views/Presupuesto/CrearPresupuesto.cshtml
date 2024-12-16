@@ -1,4 +1,4 @@
-@model tl2_tp6_2024_s0a0m.Models.Presupuesto
+@model tl2_tp6_2024_s0a0m.ViewModels.PresupuestoViewModel
 
 @{
     ViewData["Title"] = "Crear Presupuesto";
@@ -8,9 +8,15 @@
 
 <form asp-action="CrearPresupuesto" method="post" id="presupuestoForm">
     <div class="form-group">
-        <label for="NombreDestinatario">Nombre Destinatario</label>
-        <input asp-for="NombreDestinatario" class="form-control" id="NombreDestinatario" required />
-        <span asp-validation-for="NombreDestinatario" class="text-danger"></span>
+        <label for="ClienteId">Cliente</label>
+        <select asp-for="ClienteId" class="form-control" required>
+            <option value="">Seleccione un cliente</option>
+            @foreach (var cliente in Model.Clientes)
+            {
+                <option value="@cliente.ClienteId">@cliente.Nombre</option>
+            }
+        </select>
+        <span asp-validation-for="ClienteId" class="text-danger"></span>
     </div>
 
     <h3>Detalles del Presupuesto</h3>
@@ -22,41 +28,52 @@
 
     <button type="submit" class="btn btn-primary">Crear Presupuesto</button>
 </form>
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
 
 <script>
-    let index = 0;
+    let index = @Model.Detalle.Count; // Índice inicial basado en la cantidad de detalles existentes
 
-    // Agregar un nuevo detalle dinámicamente
+    // Función para agregar un nuevo detalle
     document.getElementById('addDetalle').addEventListener('click', function () {
-        const url = '/Presupuesto/AgregarPresupuestoDetalle?index=' + index;
+        const url = '/AgregarPresupuestoDetalle?index=' + index;
 
         fetch(url)
             .then(response => response.text())
             .then(html => {
                 const detallePresupuesto = document.getElementById('detallePresupuesto');
                 detallePresupuesto.insertAdjacentHTML('beforeend', html);
-                index++;
+                index++; // Incrementar el índice después de agregar un nuevo detalle
             })
             .catch(error => console.error('Error al agregar detalle:', error));
     });
 
-    // Eliminar un detalle dinámicamente y reindexar
+    // Función para eliminar un detalle dinámicamente y reindexar
     document.getElementById('detallePresupuesto').addEventListener('click', function (event) {
         if (event.target.classList.contains('removeDetalle')) {
             const detalleItem = event.target.closest('.detalle-item');
             if (detalleItem) {
+                // Eliminar el detalle visualmente
                 detalleItem.remove();
 
-                // Reindexar los nombres de los detalles restantes
+                // Reindexar todos los elementos después de eliminar
                 const detalleItems = document.querySelectorAll('#detallePresupuesto .detalle-item');
                 detalleItems.forEach((item, newIndex) => {
+                    // Actualizar los atributos name de cada elemento
                     const selectProducto = item.querySelector('select[name^="Detalle"]');
                     const inputCantidad = item.querySelector('input[name^="Detalle"]');
 
                     if (selectProducto) {
-                        selectProducto.name = `Detalle[${newIndex}].Producto.IdProducto`;
+                        // Asegurarse de que el campo select tenga el índice correcto
+                        selectProducto.name = `Detalle[${newIndex}].IdProducto`;
                     }
                     if (inputCantidad) {
+                        // Asegurarse de que el campo cantidad tenga el índice correcto
                         inputCantidad.name = `Detalle[${newIndex}].Cantidad`;
                     }
                 });
